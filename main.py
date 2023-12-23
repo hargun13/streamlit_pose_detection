@@ -243,8 +243,9 @@ def main():
     cap = cv2.VideoCapture(0)
 
     image_placeholder = st.empty()
-    left_counter_placeholder = st.empty()
-    right_counter_placeholder = st.empty()
+    # left_counter_placeholder = st.empty()
+    # right_counter_placeholder = st.empty()
+    counter_placeholder = st.empty()
 
     while True:
         ret, frame = cap.read()
@@ -253,11 +254,12 @@ def main():
         image_placeholder.image(processed_frame, channels="BGR", use_column_width=True)
 
         # Display counters
-        left_counter_placeholder.text(f"Left Reps: {left_counter}")
-        right_counter_placeholder.text(f"Right Reps: {right_counter}")
+        # left_counter_placeholder.text(f"Left Reps: {left_counter}")
+        # right_counter_placeholder.text(f"Right Reps: {right_counter}")
+        counter_placeholder.text(f"Left Reps: {left_counter} | Right Reps: {right_counter}")
 
         # Ensure updates are displayed
-        st.empty()
+        # st.empty()
 
 if __name__ == '__main__':
     main()
