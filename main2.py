@@ -47,49 +47,54 @@ def process_frame(frame):
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
         try:
-            landmarks = results.pose_landmarks.landmark
+            if results.pose_landmarks:
+                landmarks = results.pose_landmarks.landmark
 
-            # Draw landmarks
-            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                       mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=2),
-                                       mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=2))
+                # Draw landmarks
+                mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
+                                           mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=2),
+                                           mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2, circle_radius=2))
 
-            # Get coordinates for left hand
-            shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
-                        landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
-            elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
-                    landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
-            wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
-                    landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+                # Get coordinates for left hand
+                shoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,
+                            landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                elbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,
+                        landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+                wrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,
+                        landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
 
-            # Get coordinates for right hand
-            shoulder1 = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
-                         landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
-            elbow1 = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
-                      landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
-            wrist1 = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
-                      landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+                # Get coordinates for right hand
+                shoulder1 = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,
+                             landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                elbow1 = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,
+                          landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+                wrist1 = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,
+                          landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
 
-            # Calculate angles for left and right hands
-            angle_left = calculate_angle(shoulder, elbow, wrist)
-            angle_right = calculate_angle(shoulder1, elbow1, wrist1)
+                # Calculate angles for left and right hands
+                angle_left = calculate_angle(shoulder, elbow, wrist)
+                angle_right = calculate_angle(shoulder1, elbow1, wrist1)
 
-            # Curl counter logic for left hand
-            if angle_left > 160:
-                left_stage = "down"
-            if (angle_left < 45) and left_stage == 'down' and left_prev_stage != 'up':
-                left_stage = "up"
-                left_counter += 1
+                # Curl counter logic for left hand
+                if angle_left > 160:
+                    left_stage = "down"
+                if (angle_left < 45) and left_stage == 'down' and left_prev_stage != 'up':
+                    left_stage = "up"
+                    left_counter += 1
 
-            # Curl counter logic for right hand
-            if angle_right > 160:
-                right_stage = "down"
-            if (angle_right < 45) and right_stage == 'down' and right_prev_stage != 'up':
-                right_stage = "up"
-                right_counter += 1
+                # Curl counter logic for right hand
+                if angle_right > 160:
+                    right_stage = "down"
+                if (angle_right < 45) and right_stage == 'down' and right_prev_stage != 'up':
+                    right_stage = "up"
+                    right_counter += 1
 
-            left_prev_stage = left_stage
-            right_prev_stage = right_stage
+                left_prev_stage = left_stage
+                right_prev_stage = right_stage
+            else:
+                # Reset counters if pose is not detected
+                left_counter = 0
+                right_counter = 0
 
         except Exception as e:
             print(f"Exception: {e}")
