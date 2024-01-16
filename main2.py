@@ -169,6 +169,9 @@ def main():
                         padding:  0px 10px 0px 10px;
                         max-width: 46rem;
                     }
+                    .st-emotion-cache-uf99v8{
+                        background-color: #ffffff;
+                    }
                     .st-emotion-cache-16txtl3 {
                         padding: 1.5rem 1.5rem;
                     }
