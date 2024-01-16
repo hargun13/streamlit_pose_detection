@@ -5,7 +5,9 @@ import numpy as np
 import av
 import time 
 import threading
-import winsound
+import winsound #this is compatible with windows only not for deployment 
+from pydub import AudioSegment
+from pydub.playback import play
 from streamlit_webrtc import WebRtcMode, webrtc_streamer
 from sample_utils.turn import get_ice_servers
 
@@ -25,9 +27,9 @@ right_prev_stage = None
 repetition_limit = 0
 # reset_timeout = None
 
-# Function to play a sound
 def play_sound():
-    winsound.PlaySound("sound1.wav", winsound.SND_FILENAME)
+    sound = AudioSegment.from_wav("sound1.wav")
+    play(sound)
 
 
 # New function to reset counters and update repetition limit
