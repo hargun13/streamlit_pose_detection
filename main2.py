@@ -186,7 +186,7 @@ def main():
                     }
                     h1 {
                         padding: 0px;
-                        colour: #000000;
+                        color: #000000;
                     }
                     </style>
                     """
