@@ -3,6 +3,9 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import av
+import time 
+import threading
+import winsound
 from streamlit_webrtc import WebRtcMode, webrtc_streamer
 from sample_utils.turn import get_ice_servers
 
@@ -17,6 +20,28 @@ left_prev_stage = None
 right_counter = 0
 right_stage = None
 right_prev_stage = None
+
+# New variables for user-selected repetition limit and timeout
+repetition_limit = 0
+# reset_timeout = None
+
+# Function to play a sound
+def play_sound():
+    winsound.PlaySound("sound1.wav", winsound.SND_FILENAME)
+
+
+# New function to reset counters and update repetition limit
+def set_repetition_limit(limit):
+    global repetition_limit
+    repetition_limit = limit
+
+# New function to reset counters and update repetition limit
+def reset_counters():
+    global left_counter, right_counter, repetition_limit
+    left_counter = 0
+    right_counter = 0
+    repetition_limit = 0
+    # reset_timeout = None
 
 def calculate_angle(a, b, c):
     a = np.array(a)
@@ -93,6 +118,21 @@ def process_frame(frame):
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
             cv2.putText(image, f"Right Reps: {right_counter}", (10, 60),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+            cv2.putText(image, f"Repetition Limit: {repetition_limit}", (10, 90),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 255, 255), 2)
+
+            if left_counter >= repetition_limit and right_counter >= repetition_limit and repetition_limit>0:
+                # Exercise completed, play sound and display message
+
+                text_size = cv2.getTextSize("Exercise Completed!", cv2.FONT_HERSHEY_SIMPLEX, 1.5, 2)[0]
+                text_x = int((image.shape[1] - text_size[0]) / 2)
+                text_y = int((image.shape[0] + text_size[1]) / 2)
+                cv2.putText(image, "Exercise Completed!", (text_x, text_y),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
+                time.sleep(2)
+                play_sound()
+                
+                reset_counters()
 
 
             left_prev_stage = left_stage
@@ -111,6 +151,59 @@ def callback(frame: av.VideoFrame) -> av.VideoFrame:
 
 def main():
     st.title("Bicep Curl Counter")
+
+    hide_st_style = """
+                    <style>
+                    #MainMenu {visibility: hidden;}
+                    footer {visibility: hidden;}
+                    header {visibility: hidden;}
+                    body {
+                        margin: 0;
+                        padding: 0;
+                        background-color: #ffffff;
+                    }
+                    .st-emotion-cache-1y4p8pa {
+                        width: 100%;
+                        padding:  0px 10px 0px 10px;
+                        max-width: 46rem;
+                    }
+                    .st-emotion-cache-16txtl3 {
+                        padding: 1.5rem 1.5rem;
+                    }
+                    .st-emotion-cache-1l0ei5a {
+                        gap: 0.5rem;
+                    }
+                    h2 {
+                        padding: 15px 0px;
+                    }
+                    h1 {
+                        padding: 0px;
+                    }
+                    </style>
+                    """
+    st.markdown(hide_st_style, unsafe_allow_html=True)
+
+
+    st.sidebar.header("Select Repetition Limit")
+    beginner_btn = st.sidebar.button("Beginner - 20 reps", key="beginner")
+    intermediate_btn = st.sidebar.button("Intermediate - 30 reps", key="intermediate")
+    professional_btn = st.sidebar.button("Professional - 45 reps", key="professional")
+
+    if beginner_btn:
+        set_repetition_limit(20)
+    elif intermediate_btn:
+        set_repetition_limit(30)
+    elif professional_btn:
+        set_repetition_limit(45)
+    
+    st.sidebar.header("")
+    # Instructions in the sidebar
+    st.sidebar.header("Instructions")
+    st.sidebar.write("1. Start the camera.")
+    st.sidebar.write("2. Select the number of reps you want to do.")
+    st.sidebar.write("3. Once you see the number of reps on the screen, continue with the exercise.")
+    st.sidebar.write("4. The counter resets itself once the exercise is completed.")
+
 
     webrtc_streamer(
         key="bicep-curl-counter",
