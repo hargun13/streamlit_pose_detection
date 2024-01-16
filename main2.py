@@ -178,6 +178,9 @@ def main():
                     .st-emotion-cache-1l0ei5a {
                         gap: 0.5rem;
                     }
+                    .st-emotion-cache-13k62yr{
+                        background-color: ##86baff;
+                    }
                     h2 {
                         padding: 15px 0px;
                     }
