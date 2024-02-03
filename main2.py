@@ -192,16 +192,6 @@ def main():
                     """
     st.markdown(hide_st_style, unsafe_allow_html=True)
 
-    # Set Permissions Policy header to allow camera access
-    st.markdown(
-        """\
-        <head>
-            <meta http-equiv="Permissions-Policy" content="camera=(self)">
-        </head>
-        """,
-        unsafe_allow_html=True,
-    )
-
 
     st.sidebar.header("Select Repetition Limit")
     beginner_btn = st.sidebar.button("Beginner - 20 reps", key="beginner")
